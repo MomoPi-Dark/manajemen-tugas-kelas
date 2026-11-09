@@ -15,9 +15,22 @@ Antarmuka web Class Task Tracker menggunakan Vite, React, TypeScript, dan Bun. F
 
 5. Buka frontend di `http://localhost:5173`; API tersedia di `http://localhost:4000/api`.
 
-Compose membangun frontend dari `frontend/Dockerfile`, menunggu database sehat sebelum migrasi/seeder API dijalankan, dan menyajikan SPA dengan fallback route. Untuk menghentikan aplikasi tanpa menghapus data gunakan `docker compose down`. **Jangan gunakan `docker compose down -v` kecuali memang ingin menghapus seluruh data PostgreSQL lokal.**
+### Apa yang dilakukan Compose untuk frontend
 
-Jika hanya mengubah frontend, rebuild service dengan `docker compose build frontend && docker compose up -d frontend`.
+Service `frontend` dibangun dari `frontend/Dockerfile`; Bun dan Node tidak perlu dipasang di host untuk menjalankan aplikasi dalam container. Build frontend:
+
+1. Menyalin `package.json` dan `bun.lock`, lalu menjalankan `bun install --frozen-lockfile`.
+2. Menyediakan `VITE_API_URL=http://localhost:4000/api` sebagai build argument dari `docker-compose.yml`.
+3. Menjalankan `bun run build`, lalu menyalurkan hasil `dist/` melalui Nginx pada port container `80`. Konfigurasi Nginx mendukung route SPA.
+
+Port host `5173` dipetakan ke port Nginx `80`; buka `http://localhost:5173`. Tidak perlu membuat `frontend/.env` untuk setup Compose. Jika URL API berubah, ubah `build.args.VITE_API_URL` pada service frontend dan build ulang:
+
+```bash
+docker compose build frontend
+docker compose up -d frontend
+```
+
+Periksa frontend dengan `docker compose ps frontend` dan `docker compose logs -f frontend`. Untuk menghentikan seluruh stack tanpa menghapus data gunakan `docker compose down`. **Jangan gunakan `docker compose down -v` kecuali memang ingin menghapus seluruh data PostgreSQL lokal.**
 
 ## Menjalankan frontend tanpa Docker
 
