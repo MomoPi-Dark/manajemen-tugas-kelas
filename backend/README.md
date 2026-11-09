@@ -2,20 +2,20 @@
 
 Backend REST API untuk aplikasi Manajemen Tugas Kelas. Stack: Bun + TypeScript + Express + PostgreSQL.
 
-## Menjalankan dengan Docker Compose
+## Menjalankan seluruh aplikasi dengan Docker Compose
 
-1. Salin `.env.example` menjadi `.env`.
-2. Ganti placeholder secret dan password seed dengan nilai lokal; `JWT_SECRET` minimal 32 karakter.
-3. Ganti semua placeholder literal `<POSTGRES_PASSWORD>` pada `docker-compose.example.yml` dengan password PostgreSQL yang sama seperti di `.env`.
-4. Jalankan dari folder `backend/`:
+1. Salin `.env.example` menjadi `.env` di folder `backend/`.
+2. Isi secret JWT (minimal 32 karakter), kode pendaftaran guru, dan kredensial akun seeder dengan nilai lokal.
+3. Dari root repository, ganti semua placeholder literal `<POSTGRES_PASSWORD>` di `docker-compose.yml` dengan password PostgreSQL yang sama. Gunakan karakter URL-safe (huruf dan angka).
+4. Jalankan dari root repository:
 
    ```bash
-   docker compose -f docker-compose.example.yml up --build
+   docker compose up --build
    ```
 
-Compose menunggu PostgreSQL sehat, menjalankan migrasi dan seeder, lalu menjalankan API di `http://localhost:4000`. Cek `GET /api/health`.
+Compose membangun frontend dan API, menunggu PostgreSQL sehat, menjalankan migrasi serta seeder, lalu melayani web di `http://localhost:5173` dan API di `http://localhost:4000`. Cek `GET /api/health`.
 
-Database tes belum dibuat otomatis. Setelah Compose berjalan, buat sekali dengan `docker compose -f docker-compose.example.yml exec db createdb -U class_tracker class_tasks_test`. Untuk menghentikan container tanpa menghapus data, jalankan `docker compose -f docker-compose.example.yml down`. **Menambahkan `-v` menghapus volume dan seluruh data lokal.**
+Database tes belum dibuat otomatis. Setelah Compose berjalan, buat sekali dari root repository dengan `docker compose exec db createdb -U class_tracker class_tasks_test`. Untuk menghentikan container tanpa menghapus data, jalankan `docker compose down`. **Menambahkan `-v` menghapus volume dan seluruh data lokal.**
 
 ## Menjalankan tanpa Docker
 
@@ -47,6 +47,7 @@ Semua respons sukses memakai objek `data`; error memakai `{ "error": { "code", "
 | ------ | --------------------------------------------------- | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | GET    | `/api/health`                                       | Publik        | Pemeriksaan API dan koneksi database.                                                                                                                       |
 | GET    | `/api/classes`                                      | Publik        | Daftar kelas untuk registrasi siswa.                                                                                                                        |
+| GET    | `/api/classes/mine`                                 | Guru          | Daftar kelas milik guru yang sedang login, untuk form tugas.                                                                                                |
 | POST   | `/api/auth/register`                                | Publik        | Registrasi siswa; registrasi guru memerlukan kode undangan dan nama kelas pertama.                                                                          |
 | POST   | `/api/auth/login`                                   | Publik        | Login; mengembalikan token bearer.                                                                                                                          |
 | GET    | `/api/auth/me`                                      | Login         | Profil akun saat ini.                                                                                                                                       |
@@ -63,7 +64,7 @@ Kirim token login pada header `Authorization: Bearer <token>`. Password di-hash 
 - `bun run db:migrate` menerapkan file SQL migrasi yang belum pernah dijalankan.
 - `bun run db:seed` membuat akun, kelas, dan tugas contoh secara idempoten.
 - `bun run test` menjalankan tes endpoint dan skema. Script memaksa `NODE_ENV=test` dan mensyaratkan `TEST_DATABASE_URL` ke database terpisah bernama `class_tasks_test`; tes tidak boleh diarahkan ke database aplikasi.
-- Dengan Compose, buat database tes terlebih dahulu menggunakan perintah `createdb` di atas. Jalankan tes dari dalam container API dengan `docker compose -f docker-compose.example.yml exec api bun run test`.
+- Dengan Compose, buat database tes terlebih dahulu menggunakan perintah `createdb` di atas. Jalankan tes dari dalam container API dengan `docker compose exec api bun run test`.
 
 ## Keputusan desain
 
@@ -77,6 +78,7 @@ Kirim token login pada header `Authorization: Bearer <token>`. Password di-hash 
 ## Penggunaan AI
 
 AI membantu menentukan stack dan ruang lingkup aplikasi, app testing, dan juga celah kerentanan
+
 AI membantu menyusun kode pada bagian berikut:
 
 - **Database (`src/db/`)**: migrasi skema, dan seeder.

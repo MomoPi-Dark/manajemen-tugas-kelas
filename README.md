@@ -6,17 +6,14 @@ Aplikasi Class Task Tracker untuk guru membuat dan mengelola tugas kelas, serta 
 
 - [x] Backend REST API dengan Express, TypeScript, Bun, dan PostgreSQL.
 - [x] Migrasi skema dan seeder akun/kelas/tugas contoh.
-- [x] Tes integrasi endpoint dan Docker Compose untuk backend/database.
-- [ ] Frontend Vite + React belum dikerjakan.
+- [x] Tes integrasi endpoint dan Docker Compose untuk seluruh stack.
+- [x] Frontend web Vite + React + TypeScript dengan autentikasi, dashboard peran, serta alur tugas.
 
-## Backend lokal
+## Menjalankan seluruh aplikasi dengan Docker Compose
 
-Lihat [`backend/README.md`](backend/README.md) untuk setup PostgreSQL lokal atau Docker Compose, variabel environment, akun contoh, dan endpoint.
+1. Salin `backend/.env.example` menjadi `backend/.env`, lalu isi secret dan akun contoh lokal.
+2. Ganti placeholder `<POSTGRES_PASSWORD>` di `docker-compose.yml` dengan satu password URL-safe yang sama di ketiga kemunculannya.
+3. Dari root repository jalankan `docker compose up --build`. Perintah ini membangun dan menjalankan tiga service: PostgreSQL (`db`), REST API (`api`), dan web frontend (`frontend`) dari `frontend/Dockerfile`.
+4. Buka web frontend di `http://localhost:5173`; API berjalan di `http://localhost:4000`.
 
-Ringkasnya:
-
-1. Siapkan Bun dan PostgreSQL.
-2. Salin `backend/.env.example` menjadi `backend/.env`, lalu ganti semua nilai placeholder dengan nilai lokal.
-3. Buat database `class_tasks` dan `class_tasks_test`.
-4. Dari folder `backend/`, jalankan `bun install`, `bun run db:migrate`, `bun run db:seed`, dan `bun run dev`.
-
+Lihat [`backend/README.md`](backend/README.md) untuk detail konfigurasi backend, akun contoh, endpoint, dan pengelolaan database. Lihat [`frontend/README.md`](frontend/README.md) untuk cara menjalankan frontend sendiri dengan Bun.
