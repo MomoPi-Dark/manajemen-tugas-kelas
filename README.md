@@ -20,4 +20,3 @@ Ringkasnya:
 3. Buat database `class_tasks` dan `class_tasks_test`.
 4. Dari folder `backend/`, jalankan `bun install`, `bun run db:migrate`, `bun run db:seed`, dan `bun run dev`.
 
-Jangan commit file `.env`, password, token, atau API key. Gunakan `.env.example` sebagai template.
